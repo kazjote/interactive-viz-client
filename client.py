@@ -3,6 +3,7 @@
 import dbus
 import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib
 from dbus.mainloop.glib import DBusGMainLoop
 from gi.repository import GLib
 import json
@@ -16,13 +17,20 @@ interactive_viz = dbus.Interface(proxy,
 
 x = np.linspace(-10, 10, 100)
 
+matplotlib.use('Gtk4Agg')
+
+fig = plt.figure()
+ax = fig.add_subplot(111)
+plt.ion()
+fig.show()
+
 def params_changed(params):
+    ax.cla()
     params_dict = json.loads(params)
     
     y = x * params_dict['slope'] + params_dict['slope'] + np.random.normal(0, 4, x.shape)
-    plt.plot(x, y)
-    plt.savefig('/tmp/plot.svg')
-    plt.close()
+    ax.plot(x, y)
+    # plt.savefig('/tmp/plot.svg')
     
     interactive_viz.ReloadPicture('/tmp/plot.svg')
 
